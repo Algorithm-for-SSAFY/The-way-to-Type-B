@@ -1,3 +1,5 @@
+
+
 import java.util.*;
 import java.io.*;
 
@@ -86,6 +88,10 @@ public class Solution {
     }
     
     public static void honey_collection(int[] h, int depth, int sum, int profit) {
+    	if (profit == C*C) {
+    		return;
+    	}
+    	
     	if (sum > C) {
     		return;
     	}
