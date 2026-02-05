@@ -1,0 +1,24 @@
+name: Push to Org Sub-Folder
+
+on:
+  push:
+    branches: [ main ]  # 본인 브랜치 이름 확인 (master면 수정)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout My Code
+        uses: actions/checkout@v3
+
+      - name: Push to Specific Folder
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.TARGET_TOKEN }} # 아까 등록한 토큰 이름 (수정 X)
+        with:
+          source-directory: '.'                       # 내 레포의 모든 파일을
+          destination-github-username: 'Algorithm-for-SSAFY'       # 1. Organization 이름 (예: SSAFY-15)
+          destination-repository-name: 'The-way-to-Type-B'   # 2. Org의 레포 이름 (예: final-project)
+          user-email: 'msc503@naver.com'           # 3. 커밋 기록에 남길 이메일
+          target-branch: 'main'                       # 4. Org 레포의 브랜치 (보통 main)
+          target-directory: 'Code-Tree'              # 5. ⭐ 여기가 핵심! 파일을 넣을 폴더 경로
