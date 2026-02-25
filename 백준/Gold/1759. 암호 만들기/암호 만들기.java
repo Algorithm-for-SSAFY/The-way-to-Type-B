@@ -1,12 +1,13 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
-	static List<String> seq = new ArrayList<>();
-	static int res = 0;
+	static String[] seq;
 	static int L;
 	static int C;
 	static List<String> ps = new ArrayList<>();
@@ -34,7 +35,7 @@ public class Main {
 		}
 		
 		for(int i=start;i<C;i++) {
-			ps.add(seq.get(i));
+			ps.add(seq[i]);
 			dfsS(i+1);
 			ps.remove(ps.size()-1);
 		}
@@ -45,12 +46,14 @@ public class Main {
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		L = Integer.parseInt(st.nextToken());// 암호 길이
 		C = Integer.parseInt(st.nextToken());// 가능 문자 갯수
-
+		
+		seq = new String[C];
+		
 		st = new StringTokenizer(br.readLine());
 		for (int i = 0; i < C; i++) {
-			seq.add(st.nextToken());
+			seq[i] = st.nextToken();
 		}
-		seq.sort(null);// 사전 순이니 정렬
+		Arrays.sort(seq);// 사전 순이니 정렬
 
 		dfsS(0);
 
