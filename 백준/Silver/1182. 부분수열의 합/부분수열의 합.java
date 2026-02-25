@@ -9,7 +9,6 @@ public class Main {
 	static int res = 0;
 	static int N;
 	static int S;
-	static List<Integer> seqP = new ArrayList<>();
 	
 	public static void dfsS(int idx, int cSum) {
 		if (idx == N) {
