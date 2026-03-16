@@ -1,84 +1,107 @@
+import java.util.*;
 import java.io.*;
-import java.util.Arrays;
-import java.util.PriorityQueue;
-import java.util.StringTokenizer;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken());
-        int M = Integer.parseInt(st.nextToken());
-        int X = Integer.parseInt(st.nextToken());
-        int[][] arr = new int[N+1][N+1];
-        for(int i=0; i<=N; i++){
-            Arrays.fill(arr[i], 1000000);
-        }
-        for(int i=1; i<=N; i++){
-            arr[i][i] = 0;
-        }
-        for(int i=0; i<M; i++){
-            st = new StringTokenizer(br.readLine());
-            int country1 = Integer.parseInt(st.nextToken());
-            int country2 = Integer.parseInt(st.nextToken());
-            int time = Integer.parseInt(st.nextToken());
-            arr[country1][country2] = time;
-        }
-        int[][] minArray = new int[N+1][N+1];
-        for(int i=1; i<=N; i++){
-            int[] minDistance = new int[N+1];
-            Arrays.fill(minDistance, 1000000);
-            boolean[] visited = new boolean[N+1];
-            dijkstra(i, arr, minDistance, visited, N);
-                        for(int j=1; j<=N; j++){
-                minArray[i][j] = minDistance[j];
-            }
-        }
-        int answer = 0;
-        for(int i=1; i<=N; i++){
-            if(minArray[i][X] == 1000000 || minArray[X][i] == 1000000){
-                continue;
-            }
-            answer = Math.max(answer, minArray[i][X] + minArray[X][i]);
-        }
-        bw.write(answer + "\n");
-        bw.flush();
-    }
-
-    public static void dijkstra(int num, int[][] arr, int[] minDistance, boolean[] visited, int N){
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        minDistance[num] = 0;
-        pq.offer(new Node(num, 0));
-        while(!pq.isEmpty()){
-            Node node = pq.poll();
-            num = node.number;
-            if(!visited[num]){
-                visited[num] = true;
-                for(int i=1; i<=N; i++){
-                    if(visited[i]){
-                        continue;
-                    }
-                    if(minDistance[i] > minDistance[num] + arr[num][i]){
-                        minDistance[i] = minDistance[num] + arr[num][i];
-                        pq.offer(new Node(i, minDistance[i]));
-                    }
-                }
-            }
-        }
-    }
-
-    static class Node implements Comparable<Node> {
-        int number;
-        int distance;
-        public Node(int number, int distance){
-            this.number = number;
-            this.distance = distance;
-        }
-
-        @Override
-        public int compareTo(Node o) {
-            return this.distance - o.distance;
-        }
-    }
+	static int N, M, X;
+	static class Connection implements Comparable<Connection> {
+		int num;
+		int time;
+		public Connection(int num, int time) {
+			this.num = num;
+			this.time = time;
+		}
+		@Override
+		public int compareTo(Connection c) {
+			return this.time - c.time;
+		}
+	}
+	static List<Connection>[] connectedFrom;
+	static List<Connection>[] connectedTo;
+	static Integer[] minimumTo;
+	static Integer[] minimumFrom;
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		StringBuilder sb = new StringBuilder();
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		X = Integer.parseInt(st.nextToken());
+		connectedFrom = new List[N+1];
+		connectedTo = new List[N+1];
+		for(int i=1; i<=N; i++) {
+			connectedFrom[i] = new ArrayList<>();
+			connectedTo[i] = new ArrayList<>();
+		}
+		for(int i=0; i<M; i++) { 
+			st = new StringTokenizer(br.readLine());
+			int S = Integer.parseInt(st.nextToken());
+			int E = Integer.parseInt(st.nextToken());
+			int T = Integer.parseInt(st.nextToken());
+			connectedFrom[E].add(new Connection(S, T));
+			connectedTo[S].add(new Connection(E, T));
+		}
+		dijkstra(X);
+		int answer = 0;
+		for(int i=1; i<=N; i++) {
+			answer = Math.max(answer, minimumTo[i] + minimumFrom[i]);
+		}
+		sb.append(answer).append("\n");
+		bw.write(sb.toString());
+		bw.flush();
+	}
+	public static void dijkstra(int startNum) {
+		boolean[] visited = new boolean[N+1];
+		minimumTo = new Integer[N+1];
+		minimumTo[startNum] = 0;
+		visited[startNum] = true;
+		PriorityQueue<Connection> pq = new PriorityQueue<>();
+		for(Connection c : connectedTo[startNum]) {
+			minimumTo[c.num]= c.time; 
+			pq.offer(c);
+		}
+		while(!pq.isEmpty()) {
+			Connection current = pq.poll();
+			int cn = current.num;
+			int ct = current.time;
+			if(visited[cn]) {
+				continue;
+			}
+			visited[cn] = true;
+			for(Connection next : connectedTo[cn]) {
+				int nn = next.num;
+				int nt = next.time;
+				if(minimumTo[nn] == null || minimumTo[nn] > ct + nt) {
+					minimumTo[nn] = ct + nt;
+					pq.offer(new Connection(nn, ct+nt));
+				}
+			}
+		}
+		visited = new boolean[N+1];
+		minimumFrom = new Integer[N+1];
+		minimumFrom[startNum] = 0;
+		visited[startNum] = true;
+		pq.clear();
+		for(Connection c : connectedFrom[startNum]) {
+			minimumFrom[c.num] = c.time; 
+			pq.offer(c);
+		}
+		while(!pq.isEmpty()) {
+			Connection current = pq.poll();
+			int cn = current.num;
+			int ct = current.time;
+			if(visited[cn]) {
+				continue;
+			}
+			visited[cn] = true;
+			for(Connection next : connectedFrom[cn]) {
+				int nn = next.num;
+				int nt = next.time;
+				if(minimumFrom[nn] == null || minimumFrom[nn] > ct + nt) {
+					minimumFrom[nn] = ct + nt;
+					pq.offer(new Connection(nn, ct+nt));
+				}
+			}
+		}
+	}
 }
