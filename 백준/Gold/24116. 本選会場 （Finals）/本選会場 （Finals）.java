@@ -27,7 +27,7 @@ public class Main {
 		K = Integer.parseInt(st.nextToken());
 		roots = new int[N+1];
 		for(int i=1; i<=N; i++) {
-			roots[i] = i;
+			roots[i] = -1;
 		}
 		PriorityQueue<Road> pq = new PriorityQueue<>();
 		for(int i=0; i<M; i++) {
@@ -53,15 +53,24 @@ public class Main {
 		bw.flush();
 	}
 	public static boolean union(int num1, int num2) {
-		if(find(num1) == find(num2)) {
+		int root1 = find(num1);
+		int root2 = find(num2);
+		if(root1 == root2){
 			return false;
 		}
-		roots[find(num1)] = find(num2);
+		if(roots[root1] > roots[root2]) {
+			roots[root1] = root2;
+		} else if(roots[root1] < roots[root2]) {
+			roots[root2] = root1;
+		} else {
+			roots[root1] = root2;
+			roots[root2]--;
+		}
 		return true;
 	}
 	public static int find(int num) {
 		List<Integer> list = new ArrayList<>();
-		while(roots[num] != num) {
+		while(roots[num] > 0) {
 			list.add(num);
 			num = roots[num];
 		}
