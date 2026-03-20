@@ -1,87 +1,74 @@
-import java.io.*;
 import java.util.*;
+import java.io.*;
 
 public class Main {
-
 	static int V, E;
-	static int[] parent;
-	static ArrayList<Edge> edgeLst;
-
+	static int[] parents;
+	static class Connection implements Comparable<Connection> {
+		int num1;
+		int num2;
+		int weight;
+		public Connection(int num1, int num2, int weight) {
+			this.num1 = num1;
+			this.num2 = num2;
+			this.weight = weight;
+		}
+		@Override
+		public int compareTo(Connection c) {
+			return this.weight - c.weight;
+		}
+	}
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
-		st = new StringTokenizer(br.readLine());
-
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		StringTokenizer st = new StringTokenizer(br.readLine());
 		V = Integer.parseInt(st.nextToken());
 		E = Integer.parseInt(st.nextToken());
-
-		edgeLst = new ArrayList<>();
-
-		for (int i = 0; i < E; i++) {
+		parents = new int[V+1];
+		for(int i=1; i<=V; i++) {
+			parents[i] = i;
+		}
+		Connection[] connections = new Connection[E];
+		for(int i=0; i<E; i++) {
 			st = new StringTokenizer(br.readLine());
-			int start = Integer.parseInt(st.nextToken());
-			int end = Integer.parseInt(st.nextToken());
-			int weight = Integer.parseInt(st.nextToken());
-			edgeLst.add(new Edge(start, end, weight));
+			int A = Integer.parseInt(st.nextToken());
+			int B = Integer.parseInt(st.nextToken());
+			int C = Integer.parseInt(st.nextToken());
+			connections[i] = new Connection(A, B, C);
 		}
-		
-		Collections.sort(edgeLst);
-
-		parent = new int[V + 1];
-		for (int i = 1; i <= V; i++) {
-			parent[i] = i;
-		}
-		
-		int finalCost= 0;
-		int connectEdge = 0;
-		
-		for (Edge edge : edgeLst) {
-			if (find(edge.start) != find(edge.end)) {
-				union(edge.start, edge.end);
-				finalCost += edge.weight;
-				connectEdge++;
-				
-				if(connectEdge == V -1) break;
+		Arrays.sort(connections);
+		long sum = 0L;
+		int count = 0;
+		for(int i=0; i<E; i++) {
+			if(count == V-1) {
+				break;
+			}
+			Connection c = connections[i];
+			int num1 = c.num1;
+			int num2 = c.num2;
+			if(union(num1, num2)) {
+				sum += c.weight;
+				count++;
 			}
 		}
-		
-		System.out.println(finalCost);
-
+		bw.write(sum + "\n");
+		bw.flush();
 	}
-	
-	public static int find(int x) {
-		if (parent[x] == x) return x;
-		return parent[x] = find(parent[x]);
-	}
-	
-	public static void union(int a, int b) {
-		int rootA = find(a);
-		int rootB = find(b);
-		
-		if (rootA != rootB) {
-			if (rootA < rootB) parent[rootB] = rootA;
-			else parent[rootA]= rootB;
+	public static boolean union(int num1, int num2) {
+		int root1 = findRoot(num1);
+		int root2 = findRoot(num2);
+		if(root1 == root2) {
+			return false;
+		} else {
+			parents[root1] = root2;
+			return true;
 		}
 	}
-
-}
-
-
-
-class Edge implements Comparable<Edge> {
-	int start;
-	int end;
-	int weight;
-
-	Edge(int start, int end, int weight) {
-		this.start = start;
-		this.end = end;
-		this.weight = weight;
+	public static int findRoot(int num) {
+		if(parents[num] == num) {
+			return num;
+		}
+		parents[num] = findRoot(parents[num]);
+		return parents[num];
 	}
-
-	@Override
-	public int compareTo(Edge o) {
-		return this.weight - o.weight;
-	}
-
 }
