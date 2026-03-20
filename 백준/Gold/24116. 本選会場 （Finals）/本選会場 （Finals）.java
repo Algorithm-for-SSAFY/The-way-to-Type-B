@@ -4,7 +4,7 @@ import java.io.*;
 public class Main {
 	static int N, M, K;
 	static int[] roots;
-	static class Road {
+	static class Road implements Comparable<Road> {
 		int num1;
 		int num2;
 		int cost;
@@ -12,6 +12,10 @@ public class Main {
 			this.num1 = num1;
 			this.num2 = num2;
 			this.cost = cost;
+		}
+		@Override
+		public int compareTo(Road r) {
+			return this.cost - r.cost;
 		}
 	}
 	public static void main(String[] args) throws IOException {
@@ -25,7 +29,7 @@ public class Main {
 		for(int i=1; i<=N; i++) {
 			roots[i] = i;
 		}
-		PriorityQueue<Road> pq = new PriorityQueue<>((r1, r2) -> r1.cost - r2.cost);
+		PriorityQueue<Road> pq = new PriorityQueue<>();
 		for(int i=0; i<M; i++) {
 			st = new StringTokenizer(br.readLine());
 			int A = Integer.parseInt(st.nextToken());
@@ -34,7 +38,6 @@ public class Main {
 			pq.offer(new Road(A, B, C));
 		}
 		int sum = 0;
-		int roadCount = 0;
 		int cityCount = N;
 		while(!pq.isEmpty()) {
 			if(cityCount == K) {
@@ -43,7 +46,6 @@ public class Main {
 			Road r = pq.poll();
 			if(union(r.num1, r.num2)) {
 				sum += r.cost;
-				roadCount++;
 				cityCount--;
 			}
 		}
