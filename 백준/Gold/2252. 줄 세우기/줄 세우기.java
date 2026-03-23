@@ -5,6 +5,7 @@ public class Main {
 	static int N, M;
 	static List<Integer>[] connectedTo;
 	static int[] preCount;
+	static StringBuilder sb = new StringBuilder();
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -23,11 +24,11 @@ public class Main {
 			connectedTo[a].add(b);
 			preCount[b]++;
 		}
-		StringBuilder sb = BFS(new StringBuilder());
+		BFS();
 		bw.write(sb.toString());
 		bw.flush();
 	}
-	public static StringBuilder BFS(StringBuilder sb) {
+	public static void BFS() {
 		boolean[] visited = new boolean[N+1];
 		Queue<Integer> queue = new LinkedList<>();
 		for(int i=1; i<=N; i++) {
@@ -47,6 +48,5 @@ public class Main {
 				}
 			}
 		}
-		return sb;
 	}
 }
