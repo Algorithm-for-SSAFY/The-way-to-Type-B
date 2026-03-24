@@ -4,8 +4,8 @@ import java.io.*;
 public class Main {
 	static int N, B, K;
 	static int[][] arr;
-	static int[][] maxArray;
-	static int[][] minArray;
+	static int[][] horizontalArray;
+	static int[][] verticalArray;
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -16,27 +16,36 @@ public class Main {
 		B = Integer.parseInt(st.nextToken());
 		K = Integer.parseInt(st.nextToken());
 		arr = new int[N][N];
-		maxArray = new int[N][N];
-		minArray = new int[N][N];
-		for (int r = 0; r < N; r++) {
-			Arrays.fill(minArray[r], 250);
-		}
 		for (int r = 0; r < N; r++) {
 			st = new StringTokenizer(br.readLine());
 			for (int c = 0; c < N; c++) {
 				arr[r][c] = Integer.parseInt(st.nextToken());
 			}
 		}
+		horizontalArray = new int[N][N-B+1];
 		for (int r = 0; r < N; r++) {
-			for (int c = 0; c < N; c++) {
-				for (int i = r; i >= r - (B - 1); i--) {
-					for (int j = c; j >= c - (B - 1); j--) {
-						if(!checkRange(i, j)) {
-							break;
-						}
-						maxArray[i][j] = Math.max(maxArray[i][j], arr[r][c]);
-						minArray[i][j] = Math.min(minArray[i][j], arr[r][c]);							
-					}
+			for (int c = 0; c < N-B+1; c++) {
+				int max = 0;
+				int min = 250;
+				for(int d=0; d<B; d++) {
+					max = Math.max(max, arr[r][c+d]);
+					min = Math.min(min, arr[r][c+d]);
+				}
+				horizontalArray[r][c] = max * 1000 + min;
+			}
+		}
+		verticalArray = new int[N-B+1][N-B+1];
+		for(int r=0; r<N-B+1; r++) {
+			for(int c=0; c<N-B+1; c++) {
+				int max = 0;
+				int min = 250;
+				for(int d=0; d<B; d++) {
+					int value = horizontalArray[r+d][c];
+					int maxV = value / 1000;
+					int minV = value % 1000;
+					max = Math.max(max, maxV);
+					min = Math.min(min, minV);
+					verticalArray[r][c] = max * 1000 + min;
 				}
 			}
 		}
@@ -44,7 +53,8 @@ public class Main {
 			st = new StringTokenizer(br.readLine());
 			int r = Integer.parseInt(st.nextToken()) - 1;
 			int c = Integer.parseInt(st.nextToken()) - 1;
-			sb.append(maxArray[r][c] - minArray[r][c]).append("\n");
+			int value = verticalArray[r][c];
+			sb.append(value / 1000 - value % 1000).append("\n");
 		}
 		bw.write(sb.toString());
 		bw.flush();
