@@ -18,17 +18,19 @@ public class Main {
 		dp = new int[N+1][N+1];
 		for(int i=1; i<=N; i++) {
 			for(int d=0; i-d>=1 && i+d<=N; d++) {
-				if(d==0 || (numbers[i-d] == numbers[i+d] && dp[i-d+1][i+d-1] == 1)) {
+				if(numbers[i-d] == numbers[i+d] && (d==0 || dp[i-d+1][i+d-1] == 1)) {
 					dp[i-d][i+d] = 1;
+				} else {
+					break;
 				}
 			}
 		}
 		for(int i=1; i<=N-1; i++) {
 			for(int d=0; i-d>=1 && i+1+d<=N; d++) {
-				if(d == 0 && numbers[i-d] == numbers[i+1+d]) {
+				if(numbers[i-d] == numbers[i+1+d] && (d == 0 || dp[i-d+1][i+d] == 1)) {
 					dp[i-d][i+1+d] = 1;
-				} else if(numbers[i-d] == numbers[i+1+d] && dp[i-d+1][i+d] == 1) {
-					dp[i-d][i+1+d] = 1;
+				} else {
+					break;
 				}
 			}
 		}
