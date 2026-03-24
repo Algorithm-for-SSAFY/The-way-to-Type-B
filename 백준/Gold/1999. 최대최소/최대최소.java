@@ -24,31 +24,74 @@ public class Main {
 		}
 		horizontalArray = new int[N][N-B+1];
 		for (int r = 0; r < N; r++) {
-			for (int c = 0; c < N-B+1; c++) {
-				int max = 0;
-				int min = 250;
-				for(int d=0; d<B; d++) {
-					max = Math.max(max, arr[r][c+d]);
-					min = Math.min(min, arr[r][c+d]);
+			TreeMap<Integer, Integer> tm = new TreeMap<>();
+			int leftIndex = 0;
+			int rightIndex = B-1;
+			for(int c=leftIndex; c<=rightIndex; c++) {
+				int num = arr[r][c];
+				tm.put(num, tm.getOrDefault(num, 0) + 1);
+			}
+			int max = tm.lastKey();
+			int min = tm.firstKey();
+			horizontalArray[r][leftIndex] = max * 1000 + min;
+			while(true) {
+				int left = arr[r][leftIndex];
+				remove(tm, left);
+				leftIndex++;
+				rightIndex++;
+				if(rightIndex == N) {
+					break;
 				}
-				horizontalArray[r][c] = max * 1000 + min;
+				int right = arr[r][rightIndex];
+				tm.put(right, tm.getOrDefault(right, 0) + 1);
+				max = tm.lastKey();
+				min = tm.firstKey();
+				horizontalArray[r][leftIndex] = max * 1000 + min; 
 			}
 		}
+//		for(int r=0; r<N; r++) {
+//			System.out.println(Arrays.toString(horizontalArray[r]));
+//		}
 		verticalArray = new int[N-B+1][N-B+1];
-		for(int r=0; r<N-B+1; r++) {
-			for(int c=0; c<N-B+1; c++) {
-				int max = 0;
-				int min = 250;
-				for(int d=0; d<B; d++) {
-					int value = horizontalArray[r+d][c];
-					int maxV = value / 1000;
-					int minV = value % 1000;
-					max = Math.max(max, maxV);
-					min = Math.min(min, minV);
-					verticalArray[r][c] = max * 1000 + min;
+		for(int c=0; c<N-B+1; c++) {
+			TreeMap<Integer, Integer> tm = new TreeMap<>();
+			int upIndex = 0;
+			int downIndex = B-1;
+			for(int r=upIndex; r<=downIndex; r++) {
+				int value = horizontalArray[r][c];
+				int max = value / 1000;
+				int min = value % 1000;
+				tm.put(max, tm.getOrDefault(max, 0) + 1);
+				tm.put(min, tm.getOrDefault(min, 0) + 1);
+			}
+			int max = tm.lastKey();
+			int min = tm.firstKey();
+			verticalArray[upIndex][c] = max * 1000 + min;
+			while(true) {
+				int up = horizontalArray[upIndex][c];
+				int upMax = up / 1000;
+				int upMin = up % 1000;
+				remove(tm, upMax);
+				remove(tm, upMin);
+				upIndex++;
+				downIndex++;
+				if(downIndex == N) {
+					break;
 				}
+				int down = horizontalArray[downIndex][c];
+				int downMax = down / 1000;
+				int downMin = down % 1000;
+				tm.put(downMax, tm.getOrDefault(downMax, 0) + 1);
+				tm.put(downMin, tm.getOrDefault(downMin, 0) + 1);
+				max = tm.lastKey();
+				min = tm.firstKey();
+				verticalArray[upIndex][c] = max * 1000 + min; 
 			}
 		}
+//		System.out.println();
+//		for(int r=0; r<N-B+1; r++) {
+//			System.out.println(Arrays.toString(verticalArray[r]));
+//		}
 		for (int i = 0; i < K; i++) {
 			st = new StringTokenizer(br.readLine());
 			int r = Integer.parseInt(st.nextToken()) - 1;
@@ -58,6 +101,14 @@ public class Main {
 		}
 		bw.write(sb.toString());
 		bw.flush();
+	}
+	public static void remove(TreeMap<Integer, Integer> tm, int num) {
+		if(tm.containsKey(num)) {
+			tm.replace(num, tm.get(num) - 1);
+			if(tm.get(num) == 0) {
+				tm.remove(num);
+			}
+		}
 	}
 
 	public static boolean checkRange(int r, int c) {
