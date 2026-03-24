@@ -15,28 +15,6 @@ public class Main {
 			numbers[i] = Integer.parseInt(st.nextToken());
 		}
 		memo = new int[N*2 + 1];
-		for(int i=1; i<=N; i++) {
-			for(int d=0; i-d>=1 && i+d<=N; d++) {
-				if(numbers[i-d] == numbers[i+d]) {
-					memo[i+i] = d+d;
-				} else {
-					break;
-				}
-			}
-		}
-		for(int i=1; i<=N; i++) {
-			int leftIndex = i;
-			int rightIndex = i+1;
-			while(leftIndex >= 1 && rightIndex <= N) {
-				if(numbers[leftIndex] == numbers[rightIndex]) {
-					memo[leftIndex+rightIndex] = rightIndex - leftIndex;
-					leftIndex--;
-					rightIndex++;
-				} else {
-					break;
-				}
-			}
-		}
 		M = Integer.parseInt(br.readLine());
 		for(int i=0; i<M; i++) {
 			st = new StringTokenizer(br.readLine());
@@ -54,7 +32,17 @@ public class Main {
 		if((E-S) <= memo[S+E]) {
 			return true;
 		} else {
-			return false;
+			int left = S;
+			int right = E;
+			while(right-left > memo[S+E]) {
+				if(numbers[left] != numbers[right]) {
+					return false;
+				}
+				left++;
+				right--;
+			}
+			memo[S+E] = E-S;
+			return true;
 		}
 	}
 }
