@@ -1,86 +1,94 @@
 import java.util.*;
-
-
 import java.io.*;
 
 public class Main {
-	
-	static int N,L,R;
-	static int[][] input;
+	static int N, L, R;
+	static int[][] map;
+	static int[] parent;
+	static List<Integer> list = new ArrayList<>();
 	static boolean[][] visited;
-	static List<int[]> change;
-	static int cnt;
-	static int sum;
-	static boolean isTrue;
-	static int[] dx = {-1,1,0,0};
-	static int[] dy = {0,0,-1,1};
-	
+	static int[][] around = {{1,0},{0,1},{-1,0},{0,-1}};
 	public static void main(String[] args) throws IOException {
-		BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
-		StringBuilder sb;
-		
-		st = new StringTokenizer(br.readLine());
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		StringTokenizer st = new StringTokenizer(br.readLine());		
 		N = Integer.parseInt(st.nextToken());
-		L= Integer.parseInt(st.nextToken());
+		L = Integer.parseInt(st.nextToken());
 		R = Integer.parseInt(st.nextToken());
-		input = new int[N][N];
-		
-		for (int i = 0; i<N; i++) {
+		map = new int[N][N];
+		for(int r=0; r<N; r++) {
 			st = new StringTokenizer(br.readLine());
-			for (int j=0; j<N; j++) {
-				input[i][j] = Integer.parseInt(st.nextToken());
+			for(int c=0; c<N; c++) {
+				map[r][c] = Integer.parseInt(st.nextToken());
 			}
 		}
 		
-		int result = 0;
+		int day = 0;
 		while(true) {
-			isTrue = false;
+			boolean moved = false;
 			visited = new boolean[N][N];
-			for (int i = 0; i<N; i++) {
-				for (int j=0; j<N; j++) {
-					if (visited[i][j]) continue;
-					cnt = 0;
-					sum = 0;
-					change = new ArrayList<>();
-					dfs(i,j);
-					
-					for(int[] x : change) {
-						input[x[0]][x[1]] = sum/cnt;
+			for(int r=0; r<N; r++) {
+				for(int c=0; c<N; c++) {
+					if(!visited[r][c]) {
+						if(BFS(r, c)) {
+							moved = true;
+							movePeople();
+						}
 					}
 				}
 			}
-			
-			if (!isTrue) {
-				break;
+			if(moved) {
+				day++;
 			} else {
-				result++;
+				break;
 			}
 		}
-		System.out.println(result);
-			
+		bw.write(day + "\n");
+		bw.flush();
 	}
-	
-	public static void dfs(int x, int y) {
-		cnt += 1;
-		sum += input[x][y];
-		visited[x][y] = true;
-		int[] t = new int[2];
-		t[0] = x;
-		t[1] = y;
-		change.add(t);
-		
-		for (int i = 0; i<4; i++) {
-			int cx = x+dx[i];
-			int cy = y+dy[i];
-			
-			if (cx>=0 && cy>=0 && cx<N && cy<N && !visited[cx][cy]) {
-				int tmp = Math.abs(input[cx][cy] - input[x][y]);
-				if (tmp >= L && tmp<=R) {
-					isTrue = true;
-					dfs(cx,cy);
-				}	
+	public static boolean checkRange(int r, int c) {
+		return r >= 0 && r < N && c >= 0 && c < N;
+	}
+	public static boolean BFS(int startR, int startC) {
+		list.clear();
+		boolean willMove = false;
+		Queue<Integer> queue = new LinkedList<>();
+		visited[startR][startC] = true;
+		queue.offer(startR * 100 + startC);
+		while(!queue.isEmpty()) {
+			int value = queue.poll();
+			list.add(value);
+			int r = value / 100;
+			int c = value % 100;
+			for(int i=0; i<4; i++) {
+				int nr = r + around[i][0];
+				int nc = c + around[i][1];
+				if(checkRange(nr, nc) && !visited[nr][nc]) {
+					int difference = Math.abs(map[nr][nc] - map[r][c]);
+					if(difference >= L && difference <= R) {
+						visited[nr][nc] = true;
+						queue.offer(nr * 100 + nc);
+						if(map[r][c] != map[nr][nc]) {
+							willMove = true;
+						}
+					}
+				}
 			}
+		}
+		return willMove;
+	}
+	public static void movePeople() {
+		int sum = 0;
+		for(int i : list) {
+			int r = i / 100;
+			int c = i % 100;
+			sum += map[r][c];
+		}
+		int people = sum / list.size();
+		for(int i : list) {
+			int r = i / 100;
+			int c = i % 100;
+			map[r][c] = people;
 		}
 	}
 }
