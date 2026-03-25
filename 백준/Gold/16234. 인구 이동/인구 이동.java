@@ -6,6 +6,7 @@ public class Main {
 	static int[][] map;
 	static int[] parent;
 	static List<Integer> list = new ArrayList<>();
+	static int sum;
 	static boolean[][] visited;
 	static int[][] around = {{1,0},{0,1},{-1,0},{0,-1}};
 	public static void main(String[] args) throws IOException {
@@ -51,6 +52,7 @@ public class Main {
 	}
 	public static boolean BFS(int startR, int startC) {
 		list.clear();
+		sum = 0;
 		boolean willMove = false;
 		Queue<Integer> queue = new LinkedList<>();
 		visited[startR][startC] = true;
@@ -60,6 +62,7 @@ public class Main {
 			list.add(value);
 			int r = value / 100;
 			int c = value % 100;
+			sum += map[r][c];
 			for(int i=0; i<4; i++) {
 				int nr = r + around[i][0];
 				int nc = c + around[i][1];
@@ -78,12 +81,6 @@ public class Main {
 		return willMove;
 	}
 	public static void movePeople() {
-		int sum = 0;
-		for(int i : list) {
-			int r = i / 100;
-			int c = i % 100;
-			sum += map[r][c];
-		}
 		int people = sum / list.size();
 		for(int i : list) {
 			int r = i / 100;
