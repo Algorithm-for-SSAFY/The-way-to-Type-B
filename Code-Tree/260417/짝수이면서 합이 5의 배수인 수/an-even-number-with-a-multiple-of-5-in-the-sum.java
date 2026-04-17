@@ -10,11 +10,11 @@ public class Main {
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		String a = st.nextToken();
 		
-		print(a);
+		System.out.println(print(a));
 		
 	}
 	
-	public static void print(String n) {
+	public static String print(String n) {
 		int numN = Integer.parseInt(n);
 		if (numN%2 == 0) {
 			int result = 0;
@@ -22,11 +22,9 @@ public class Main {
 				result += n.charAt(i)-'0';
 			}
 			if(result%5 == 0) {
-				System.out.println("Yes");
-			} else {
-				System.out.println("No");
-			}
+				return "Yes";
+			} 
 		}
-		
+		return "No";
 	}
 }
